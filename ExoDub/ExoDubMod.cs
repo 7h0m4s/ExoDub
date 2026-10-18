@@ -1,23 +1,37 @@
 
 using System.Reflection;
 using BepInEx;
+using BepInEx.Logging;
 using HarmonyLib;
+using UnityEngine;
 
 
 namespace ExoDub
 {
     [BepInPlugin(ModId, "ExoDub", "1.0.0")]
-    public class Plugin : BaseUnityPlugin
+    public class ExoDubMod : BaseUnityPlugin
     {
         private const string ModId = "exodub.exocolonist.exodub";
+        public static ManualLogSource ExoDubLogger;
+        public ExoDubMod Instance { get; private set; }
+        
         private void Awake()
         {
             Assembly executingAssembly = Assembly.GetExecutingAssembly();
             Harmony val = new Harmony(ModId);
             val.PatchAll(executingAssembly);
-            var manualLogSource = Logger;
-            if (manualLogSource != null)
-                manualLogSource.LogInfo((object)"Plugin ExoDub is loaded!");
+            ExoDubLogger = Logger;
+            if (ExoDubLogger != null)
+                ExoDubLogger.LogInfo((object)"Plugin ExoDub is loaded!");
+
+            Instance = this;
+            DubState.UnityObject = new GameObject();
+            Object.DontDestroyOnLoad(DubState.UnityObject);
+            DubState.AudioSource = DubState.UnityObject.AddComponent<AudioSource>();
+            DubState.AudioSource.loop = false;
+            
+            DubAudioEngine.LoadAudioFiles();
+
         }
     }
 
