@@ -13,7 +13,8 @@ namespace ExoDub
     {
         private const string ModId = "exodub.exocolonist.exodub";
         public static ManualLogSource ExoDubLogger;
-        public ExoDubMod Instance { get; private set; }
+        public static ExoDubMod Instance { get; private set; }
+        
         
         private void Awake()
         {
@@ -30,8 +31,9 @@ namespace ExoDub
             DubState.AudioSource = DubState.UnityObject.AddComponent<AudioSource>();
             DubState.AudioSource.loop = false;
             
-            DubAudioEngine.LoadAudioFiles();
-
+            // We don't want to load all 15000 audio files into memory
+            //DubAudioEngine.LoadAllAudioFiles();
+            DubAudioEngine.LoadFileList();
         }
     }
 

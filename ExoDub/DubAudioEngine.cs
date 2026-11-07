@@ -1,69 +1,132 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using BepInEx;
-using DarkTonic.MasterAudio;
-using Lib;
 using UnityEngine;
 using UnityEngine.Networking;
 
 namespace ExoDub
 {
-    public class DubAudioEngine
+    public static class DubAudioEngine
     {
+        public static string GetPathToAudioAssets => Path.Combine(Paths.PluginPath, DubState.Constants.ExoDubDirectory, DubState.Constants.DubCollectionLibraryDirectory, DubState.CurrentDubCollectionDirectory);
 
-        // TODO make asynchronous
-        // TODO by turning into a coroutine
-        public static void LoadAudioFiles()
+        public static readonly Dictionary<string, int> AudioFileExtensionPriority = new Dictionary<string, int>
         {
+            {".flac", 0},
+            {".ogg", 1},
+            {".wav", 2},
+            {".mp3", 3},
+            {".aif", 4},
+            {".aiff", 5},
             
-            // string currentDirectory = DubState.PluginInfo.Location;
-            string currentDirectory = Paths.PluginPath;
-            string audioAssetFilepath = Path.Combine(Paths.PluginPath, DubState.Constants.ExoDubDirectory, DubState.Constants.AudioAssetDirectory);
-            var fileList = Directory.EnumerateFiles(audioAssetFilepath);
-
-            foreach (var filePath in fileList.Where(a=> a.EndsWith(".ogg")))
+        };
+        
+        public static void LoadFileList()
+        {
+            var fileList = Directory.EnumerateFiles(GetPathToAudioAssets);
+            DubState.CurrentFileList = fileList.Where(a =>
+                    Path.HasExtension(a) && AudioFileExtensionPriority.ContainsKey(Path.GetExtension(a))
+                )
+                .GroupBy(Path.GetFileNameWithoutExtension)
+                .ToDictionary(a =>
+                        a.Key,
+                    a => a.OrderBy(b =>
+                            AudioFileExtensionPriority.TryGetValue(Path.GetExtension(b),
+                                out int order)
+                                ? order
+                                : int.MaxValue)
+                        .ToArray());
+        }
+        
+        public static void LoadAudioFile(string assetId)
+        {
+            try
             {
-                try
+                if (!DubState.CurrentFileList.TryGetValue(assetId, out string[] fileList)) return;
+                if (fileList.Length <= 0) return;
+                string filePath = fileList[0];
+                
+                var fileUri = "file:///" + filePath.Replace("\\", "/");
+                using (var req = UnityWebRequestMultimedia.GetAudioClip(fileUri, AudioType.OGGVORBIS))
                 {
-                    var fileUri = "file:///" + filePath.Replace("\\", "/");
-                    UnityWebRequestAsyncOperation requestResult;
-                    using (var req = UnityWebRequestMultimedia.GetAudioClip(fileUri, AudioType.OGGVORBIS))
+                    var requestResult = req.SendWebRequest();
+                    while (!requestResult.isDone)
                     {
-                        requestResult = req.SendWebRequest();
-                        while (!requestResult.isDone)
-                        {
-                            Thread.Sleep(1);
-                        }
-                        if (!string.IsNullOrWhiteSpace(requestResult.webRequest.error))
-                        {
-                            ExoDubMod.ExoDubLogger.LogError(requestResult.webRequest.error);
-                            continue;
-                        }
-                    
-                        var audioClip = DownloadHandlerAudioClip.GetContent(requestResult.webRequest);
-                        audioClip.name = Path.GetFileNameWithoutExtension(filePath);
-                        DubState.AudioClips.AddSafe(Path.GetFileNameWithoutExtension(filePath),audioClip);
-                        // var forceInstance = MasterAudio.Instance;
-                        // var newGroup = MasterAudio.GrabGroup(audioClip.name);
-                        // var firstGroupVariation = newGroup.groupVariations.First();
-                        // firstGroupVariation.audLocation = MasterAudio.AudioLocation.Clip;
-                        // firstGroupVariation.VarAudio.clip = audioClip;
+                        Thread.Sleep(1);
                     }
-
-                    
+                    if (!string.IsNullOrWhiteSpace(requestResult.webRequest.error))
+                    {
+                        ExoDubMod.ExoDubLogger.LogError(requestResult.webRequest.error);
+                    }
+                
+                    var audioClip = DownloadHandlerAudioClip.GetContent(requestResult.webRequest);
+                    audioClip.name = assetId;
+                    DubState.AudioClips.AddSafe(assetId,audioClip);
                 }
-                catch (Exception e)
-                {
-                    ExoDubMod.ExoDubLogger.LogError(e);
-                    Console.WriteLine(e);
-                    throw;
-                }
-
+            }
+            catch (Exception e)
+            {
+                ExoDubMod.ExoDubLogger.LogError(e);
+                Console.WriteLine(e);
+                throw;
             }
             return;
         }
+        
+
+        // TODO make asynchronous
+        // TODO by turning into a coroutine
+        // public static void LoadAllAudioFiles()
+        // {
+        //     // string currentDirectory = DubState.PluginInfo.Location;
+        //     string currentDirectory = Paths.PluginPath;
+        //     string audioAssetFilepath = Path.Combine(Paths.PluginPath, DubState.Constants.ExoDubDirectory, DubState.Constants.DubCollectionLibraryDirectory);
+        //     var fileList = Directory.EnumerateFiles(audioAssetFilepath);
+        //
+        //     foreach (var filePath in fileList.Where(a=> a.EndsWith(".ogg")))
+        //     {
+        //         try
+        //         {
+        //             var fileUri = "file:///" + filePath.Replace("\\", "/");
+        //             UnityWebRequestAsyncOperation requestResult;
+        //             using (var req = UnityWebRequestMultimedia.GetAudioClip(fileUri, AudioType.OGGVORBIS))
+        //             {
+        //                 requestResult = req.SendWebRequest();
+        //                 while (!requestResult.isDone)
+        //                 {
+        //                     Thread.Sleep(1);
+        //                 }
+        //                 if (!string.IsNullOrWhiteSpace(requestResult.webRequest.error))
+        //                 {
+        //                     ExoDubMod.ExoDubLogger.LogError(requestResult.webRequest.error);
+        //                     continue;
+        //                 }
+        //             
+        //                 var audioClip = DownloadHandlerAudioClip.GetContent(requestResult.webRequest);
+        //                 audioClip.name = Path.GetFileNameWithoutExtension(filePath);
+        //                 DubState.AudioClips.AddSafe(Path.GetFileNameWithoutExtension(filePath),audioClip);
+        //                 // var forceInstance = MasterAudio.Instance;
+        //                 // var newGroup = MasterAudio.GrabGroup(audioClip.name);
+        //                 // var firstGroupVariation = newGroup.groupVariations.First();
+        //                 // firstGroupVariation.audLocation = MasterAudio.AudioLocation.Clip;
+        //                 // firstGroupVariation.VarAudio.clip = audioClip;
+        //             }
+        //
+        //             
+        //         }
+        //         catch (Exception e)
+        //         {
+        //             ExoDubMod.ExoDubLogger.LogError(e);
+        //             Console.WriteLine(e);
+        //             throw;
+        //         }
+        //
+        //     }
+        //     return;
+        // }
         
         
         

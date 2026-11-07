@@ -70,6 +70,9 @@
         <Reference Include="UnityEngine.UnityWebRequestAudioModule">
           <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\Exocolonist\Exocolonist_Data\Managed\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
         </Reference>
+        <Reference Include="Unity.TextMeshPro">
+          <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\Exocolonist\Exocolonist_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine.UnityWebRequestModule">
           <HintPath>..\..\..\..\Program Files (x86)\Steam\steamapps\common\Exocolonist\Exocolonist_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
         </Reference>
@@ -100,15 +103,18 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="DataStructures\ChoiceLine.cs" />
         <Compile Include="DubAudioEngine.cs" />
         <Compile Include="DubState.cs" />
         <Compile Include="ExoDubMod.cs" />
         <Compile Include="ParserDataPatch.cs" />
         <Compile Include="ParserStoryPatch.cs" />
-        <Compile Include="Patches\ResultsTextPanelPatch.cs" />
+        <Compile Include="Patches\ResultsTextPanelLoadAudioPatch.cs" />
+        <Compile Include="Patches\ResultsTextPanelPlayAudioPatch.cs" />
         <Compile Include="Properties\AssemblyInfo.cs"/>
         <Compile Include="StoryPatch.cs" />
-        <Compile Include="TestVersionPatch.cs" />
+        <Compile Include="MainMenuPatch.cs" />
+        <Compile Include="Utility\TextUtility.cs" />
     </ItemGroup>
     <ItemGroup>
       <None Include="App.config" />
