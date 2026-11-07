@@ -30,7 +30,7 @@ namespace ExoDub.Utility
         public static ChoiceLine[] GetOrderedChoiceLinesForDisplayedText(this Choice choice, string displayedText)
         {
             return choice.GetAllChoiceResultLines()
-                .Select(a => (Index: displayedText.Trim().IndexOf(a.Line.Trim(), StringComparison.InvariantCultureIgnoreCase), ChoiceLine: a))
+                .Select(a => (Index: displayedText.Trim().IndexOf(TextFilter.FilterResultText(a.Line.Trim(), Princess.result, Princess.result.story) , StringComparison.InvariantCultureIgnoreCase), ChoiceLine: a))
                 .Where(a => a.Index >= 0)
                 .OrderBy(a => a.Index)
                 .Select(a=> a.ChoiceLine)
