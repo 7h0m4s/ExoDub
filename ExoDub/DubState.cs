@@ -11,13 +11,12 @@ namespace ExoDub
         public static class Constants
         {
             public const string ExoDubDirectory = "ExoDub";
-            public const string DubCollectionLibraryDirectory = "DubLibrary";
+            public const string VoicePackLibraryDirectory = "VoicePackLibrary";
+            public const string DefaultVoicePack = "DefaultVoicePack";
             public const int ChoiceAudioAssetLoadingDepth = 3;
         }
 
         public static float DelayBetweenPlayingLines = 0.3f;
-        
-        public static string CurrentDubCollectionDirectory = "Default";
         
         public static PluginInfo PluginInfo = new PluginInfo();
         
@@ -28,6 +27,8 @@ namespace ExoDub
         public static AudioSource AudioSource;
 
         public static Dictionary<string,String[]> CurrentFileList;
+        
+        public static List<string> VoicePackDirectoryList;
         
         public static Coroutine CurrentAudioCoroutine;
     }

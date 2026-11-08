@@ -11,9 +11,10 @@ namespace ExoDub
 {
     public static class DubAudioEngine
     {
-        public static string GetPathToAudioAssets => Path.Combine(Paths.PluginPath, DubState.Constants.ExoDubDirectory, DubState.Constants.DubCollectionLibraryDirectory, DubState.CurrentDubCollectionDirectory);
+        public static string GetPathToVoicePackLibrary => Path.Combine(Paths.PluginPath, DubState.Constants.ExoDubDirectory, DubState.Constants.VoicePackLibraryDirectory);
+        public static string GetPathToSelectedVoicePackAudioAssets => Path.Combine(Paths.PluginPath, DubState.Constants.ExoDubDirectory, DubState.Constants.VoicePackLibraryDirectory, ExoDubMod.Instance.selectedVoicePack.Value);
 
-        public static readonly Dictionary<string, int> AudioFileExtensionPriority = new Dictionary<string, int>
+        private static readonly Dictionary<string, int> AudioFileExtensionPriority = new Dictionary<string, int>
         {
             //{".flac", 0},
             {".ogg", 1},
@@ -25,21 +26,56 @@ namespace ExoDub
             
         };
         
+        public static void LoadVoicePackDirectoryList()
+        {
+            try
+            {
+                DubState.VoicePackDirectoryList = Directory.EnumerateDirectories(GetPathToVoicePackLibrary).Select(Path.GetFileName).ToList();
+                if (DubState.VoicePackDirectoryList.Count == 0)
+                {
+                    ExoDubMod.ExoDubLogger.LogWarning($"No Voice Packs found at '{GetPathToVoicePackLibrary}'");
+                }
+            }
+            catch (Exception e)
+            {
+                ExoDubMod.ExoDubLogger.LogError($"Error searching for voice packs at '{GetPathToVoicePackLibrary}': {e}");
+            }
+            
+        }
+        
         public static void LoadFileList()
         {
-            var fileList = Directory.EnumerateFiles(GetPathToAudioAssets);
-            DubState.CurrentFileList = fileList.Where(a =>
-                    Path.HasExtension(a) && AudioFileExtensionPriority.ContainsKey(Path.GetExtension(a).ToLower())
-                )
-                .GroupBy(Path.GetFileNameWithoutExtension)
-                .ToDictionary(a =>
-                        a.Key,
-                    a => a.OrderBy(b =>
-                            AudioFileExtensionPriority.TryGetValue(Path.GetExtension(b),
-                                out int order)
-                                ? order
-                                : int.MaxValue)
-                        .ToArray());
+            try
+            {
+                var fileList = Directory.EnumerateFiles(GetPathToSelectedVoicePackAudioAssets).ToList();
+                if (fileList.Count == 0)
+                {
+                    ExoDubMod.ExoDubLogger.LogWarning($"No files found at {GetPathToSelectedVoicePackAudioAssets}");
+                }
+            
+                DubState.CurrentFileList = fileList.Where(a =>
+                        Path.HasExtension(a) && AudioFileExtensionPriority.ContainsKey(Path.GetExtension(a).ToLower())
+                    )
+                    .GroupBy(Path.GetFileNameWithoutExtension)
+                    .ToDictionary(a =>
+                            a.Key,
+                        a => a.OrderBy(b =>
+                                AudioFileExtensionPriority.TryGetValue(Path.GetExtension(b),
+                                    out int order)
+                                    ? order
+                                    : int.MaxValue)
+                            .ToArray());
+            
+                if (DubState.CurrentFileList.Count == 0)
+                {
+                    ExoDubMod.ExoDubLogger.LogWarning($"No valid audio files found at '{GetPathToSelectedVoicePackAudioAssets}'. Only '{String.Join("-", AudioFileExtensionPriority.Keys)}' formats supported.");
+                }
+            }
+            catch (Exception e)
+            {
+                ExoDubMod.ExoDubLogger.LogError($"Error finding voice pack audio files at '{GetPathToSelectedVoicePackAudioAssets}': {e}");
+            }
+           
         }
         
         public static AudioClip LoadAudioFile(string assetId)
@@ -71,9 +107,7 @@ namespace ExoDub
             }
             catch (Exception e)
             {
-                ExoDubMod.ExoDubLogger.LogError(e);
-                Console.WriteLine(e);
-                throw;
+                ExoDubMod.ExoDubLogger.LogError($"Error loading audio file '{assetId}': {e}");
             }
             return null;
         }
@@ -97,61 +131,6 @@ namespace ExoDub
                     throw new NotImplementedException();
             }        
         }
-        
-
-        // TODO make asynchronous
-        // TODO by turning into a coroutine
-        // public static void LoadAllAudioFiles()
-        // {
-        //     // string currentDirectory = DubState.PluginInfo.Location;
-        //     string currentDirectory = Paths.PluginPath;
-        //     string audioAssetFilepath = Path.Combine(Paths.PluginPath, DubState.Constants.ExoDubDirectory, DubState.Constants.DubCollectionLibraryDirectory);
-        //     var fileList = Directory.EnumerateFiles(audioAssetFilepath);
-        //
-        //     foreach (var filePath in fileList.Where(a=> a.EndsWith(".ogg")))
-        //     {
-        //         try
-        //         {
-        //             var fileUri = "file:///" + filePath.Replace("\\", "/");
-        //             UnityWebRequestAsyncOperation requestResult;
-        //             using (var req = UnityWebRequestMultimedia.GetAudioClip(fileUri, AudioType.OGGVORBIS))
-        //             {
-        //                 requestResult = req.SendWebRequest();
-        //                 while (!requestResult.isDone)
-        //                 {
-        //                     Thread.Sleep(1);
-        //                 }
-        //                 if (!string.IsNullOrWhiteSpace(requestResult.webRequest.error))
-        //                 {
-        //                     ExoDubMod.ExoDubLogger.LogError(requestResult.webRequest.error);
-        //                     continue;
-        //                 }
-        //             
-        //                 var audioClip = DownloadHandlerAudioClip.GetContent(requestResult.webRequest);
-        //                 audioClip.name = Path.GetFileNameWithoutExtension(filePath);
-        //                 DubState.AudioClips.AddSafe(Path.GetFileNameWithoutExtension(filePath),audioClip);
-        //                 // var forceInstance = MasterAudio.Instance;
-        //                 // var newGroup = MasterAudio.GrabGroup(audioClip.name);
-        //                 // var firstGroupVariation = newGroup.groupVariations.First();
-        //                 // firstGroupVariation.audLocation = MasterAudio.AudioLocation.Clip;
-        //                 // firstGroupVariation.VarAudio.clip = audioClip;
-        //             }
-        //
-        //             
-        //         }
-        //         catch (Exception e)
-        //         {
-        //             ExoDubMod.ExoDubLogger.LogError(e);
-        //             Console.WriteLine(e);
-        //             throw;
-        //         }
-        //
-        //     }
-        //     return;
-        // }
-        
-        
-        
         
         
         public static string SafeURIForUnityWWWFromPath(string rawPath)
@@ -187,7 +166,5 @@ namespace ExoDub
             "%FD", "%FE", "%FF"
         };
         
-    
-       
     }
 }
