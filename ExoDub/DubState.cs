@@ -15,7 +15,7 @@ namespace ExoDub
             public const int ChoiceAudioAssetLoadingDepth = 3;
         }
 
-        public static float DelayBetweenPlayingLines = 1f;
+        public static float DelayBetweenPlayingLines = 0.3f;
         
         public static string CurrentDubCollectionDirectory = "Default";
         
