@@ -21,6 +21,7 @@ namespace ExoDub
         public ConfigEntry<float> volume;
         public ConfigEntry<string> selectedVoicePack;
         public ConfigEntry<float> delayBetweenLines;
+        public ConfigEntry<bool> generateCsvExport;
         
         
         
@@ -46,6 +47,11 @@ namespace ExoDub
                 "DelayBetweenLines",
                 0.3f,
                 "Seconds between each voiceline in the same textbox is played. Default is 0.3. Minimum of 0");
+            generateCsvExport = Config.Bind(
+                "General",              
+                "GenerateCsvExport",        
+                false,                   
+                "Create csv export on opening Exocolonist of all in-game text for creating new voice packs. Default is false"); 
 
             volume.BoxedValue = volume.Value.Clamp(0f,1f);
             

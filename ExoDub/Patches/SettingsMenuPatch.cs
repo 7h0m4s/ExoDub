@@ -27,6 +27,7 @@ namespace ExoDub.Patches
                 aboveButton = SettingsUtility.CreateVoicePackSelectDropdown(ref __instance, "Selected Voice Pack", ExoDubMod.Instance.selectedVoicePack, aboveButton);
                 aboveButton = SettingsUtility.CreateSlider(ref __instance, "Dubbing Volume", ExoDubMod.Instance.volume, aboveButton);
                 aboveButton = SettingsUtility.CreateSlider(ref __instance, "Delay Between Voice Lines", ExoDubMod.Instance.delayBetweenLines, aboveButton);
+                aboveButton = SettingsUtility.CreateButton(ref __instance,  ExoDubMod.Instance.generateCsvExport, aboveButton,"Csv Export On Start [ON]", "Csv Export On Start [OFF]", currentGroup);
             }
         }
     }
