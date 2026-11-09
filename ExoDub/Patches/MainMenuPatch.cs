@@ -56,26 +56,28 @@ namespace ExoDub.Patches
                     .SelectMany(a => a);
 
                 var allLinesFormatted = allLines.Select(a => new
-                {
-                    story_id = a.Choice.story.storyID,
-                    choice_id = a.Choice.choiceID,
-                    hashcode = a.Hash,
-                    filename = $"{a.Line.GetHashCode()}.wav",
-                    character = a.Choice.story?.chara?.nickname ?? "",
-                    characters = a.Choice.story?.charas.Join(),
-                    button_text = a.Choice.buttonText,
-                    sets = a.Choice.sets.Join(),
+                    {
+                        story_id = a.Choice.story.storyID,
+                        choice_id = a.Choice.choiceID,
+                        hashcode = a.Hash,
+                        filename = $"{a.Line.GetHashCode()}.wav",
+                        character = a.Choice.story?.chara?.nickname ?? "",
+                        characters = a.Choice.story?.charas.Join(),
+                        button_text = a.Choice.buttonText,
+                        sets = a.Choice.sets.Join(),
 
-                    line_to_dub = a.Line,
-                    requirements = a.Choice.requirements.Join(),
-                    path = a.Choice.path,
-                    level = a.Choice.level,
-                    is_dream = a.Choice.isDream,
-                    is_flirt = a.Choice.isFlirt,
-                    is_groundhog = a.Choice.isGroundhog,
-                    has_battle = a.Choice.hasBattle,
-                    previous_line = a.Choice.parent != null ? a.Choice.parent.resultText : String.Empty,
-                });
+                        line_to_dub = a.Line,
+                        requirements = a.Choice.requirements.Join(),
+                        path = a.Choice.path,
+                        level = a.Choice.level,
+                        is_dream = a.Choice.isDream,
+                        is_flirt = a.Choice.isFlirt,
+                        is_groundhog = a.Choice.isGroundhog,
+                        has_battle = a.Choice.hasBattle,
+                        previous_line = a.Choice.parent != null ? a.Choice.parent.resultText : String.Empty,
+                    })
+                    .GroupBy(a => $"{a.story_id}_{a.hashcode}")
+                    .Select(a => a.First());
 
                 using (var writer = new StreamWriter("AllLinesExport.csv"))
                 using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
