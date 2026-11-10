@@ -25,7 +25,7 @@ namespace ExoDub.Patches
         {
             // Skip if mod is disabled
             if (ExoDubMod.Instance.enabled.Value == false) return;
-            DubState.AudioSource.volume = Settings.instance.volumeMaster * Settings.instance.volumeUI;
+            DubState.AudioSource.volume = Settings.instance.volumeMaster * ExoDubMod.Instance.volume.Value;
             if (DubState.CurrentAudioCoroutine is null == false)
                 ExoDubMod.Instance.StopCoroutine(DubState.CurrentAudioCoroutine);
             DubState.AudioSource.Stop();
