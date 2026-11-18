@@ -35,7 +35,7 @@ If you have installed an extra voicepack, go to Settings > Audio then scroll all
 
 All settings can be accessed from inside Exocolonist by going to Settings > Audio then scrolling all the way to the bottom.
 
-<img title="" src="file:///C:/ProgramingProjects/ExocolonistDub/ExoDub/images/screenshot_settings.png" alt="screenshot_settings.png" width="504">
+![Screenshot](./images/screenshot_settings.png)
 
 | Option                | Default            | Description                                                                                          |
 | --------------------- | ------------------ | ---------------------------------------------------------------------------------------------------- |
@@ -59,9 +59,9 @@ You can also help by helping create new properly voice acted voicepacks for Exod
 
 Custom Voicepack Creation Tool : https://github.com/7h0m4s/DubiousDubber
 
-![](images/screenshot_darkmode.png)
+![Screenshot](./images/screenshot_darkmode.png)
 
-![](images/screenshot_lightmode.png)
+![Screenshot](./images/screenshot_lightmode.png)
 
 ## Known Issues
 
