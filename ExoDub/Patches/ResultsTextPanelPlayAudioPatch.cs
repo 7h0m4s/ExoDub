@@ -1,24 +1,10 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Media;
-using System.Threading;
-using DarkTonic.MasterAudio;
-using HarmonyLib;
-using ExoDub.Utility;
-using UnityEngine;
+﻿using HarmonyLib;
 
 namespace ExoDub.Patches
 {
     [HarmonyPatch]
     public static class ResultsTextPanelPlayAudioPatch
     {
-        // [HarmonyPrefix]
-        // public static bool Prefix(ResultsTextPanel __instance)
-        // {
-        //     return true;
-        // }
-
         [HarmonyPatch(typeof(ResultsTextPanel), nameof(ResultsTextPanel.SetContent))]
         [HarmonyPostfix]
         public static void Postfix(ref ResultsTextPanel __instance)
@@ -31,7 +17,6 @@ namespace ExoDub.Patches
             DubState.AudioSource.Stop();
             DubState.CurrentAudioCoroutine = ExoDubMod.Instance.StartCoroutine(Coroutines.Coroutine_PlayChoiceLines(__instance));
         }
-
         
         [HarmonyPatch(typeof(ResultsTextPanel), nameof(ResultsTextPanel.OnRecycle))]
         [HarmonyPrefix]

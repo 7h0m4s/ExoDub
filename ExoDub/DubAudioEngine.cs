@@ -131,40 +131,5 @@ namespace ExoDub
                     throw new NotImplementedException();
             }        
         }
-        
-        
-        public static string SafeURIForUnityWWWFromPath(string rawPath)
-        {
-            string text = rawPath;
-            for (int i = 0; i < rawPath.Length; i++)
-            {
-                text = text.Replace(FilePathRaw[i], FilePathSafe[i]);
-            }
-            return "file://" + text;
-        }
-        private static readonly string[] FilePathRaw = new string[73]
-        {
-            "Ž", "ž", "Ÿ", "¡", "¢", "£", "¤", "¥", "¦", "§",
-            "\u00a8", "©", "ª", "À", "Á", "Â", "Ã", "Ä", "Å", "Æ",
-            "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï", "Ð",
-            "Ñ", "Ò", "Ó", "Ô", "Õ", "Ö", "Ù", "Ú", "Û", "Ü",
-            "Ý", "Þ", "ß", "à", "á", "â", "ã", "ä", "å", "æ",
-            "ç", "è", "é", "ê", "ë", "ì", "í", "î", "ï", "ð",
-            "ñ", "ò", "ó", "ô", "õ", "ö", "ù", "ú", "û", "ü",
-            "ý", "þ", "ÿ"
-        };
-
-        private static readonly string[] FilePathSafe = new string[73]
-        {
-            "%8E", "%9E", "%9F", "%A1", "%A2", "%A3", "%A4", "%A5", "%A6", "%A7",
-            "%A8", "%A9", "%AA", "%C0", "%C1", "%C2", "%C3", "%C4", "%C5", "%C6",
-            "%C7", "%C8", "%C9", "%CA", "%CB", "%CC", "%CD", "%CE", "%CF", "%D0",
-            "%D1", "%D2", "%D3", "%D4", "%D5", "%D6", "%D9", "%DA", "%DB", "%DC",
-            "%DD", "%DE", "%DF", "%E0", "%E1", "%E2", "%E3", "%E4", "%E5", "%E6",
-            "%E7", "%E8", "%E9", "%EA", "%EB", "%EC", "%ED", "%EE", "%EF", "%F0",
-            "%F1", "%F2", "%F3", "%F4", "%F5", "%F6", "%F9", "%FA", "%FB", "%FC",
-            "%FD", "%FE", "%FF"
-        };
-        
     }
 }

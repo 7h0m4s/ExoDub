@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Policy;
 using System.Text.RegularExpressions;
 using ExoDub.DataStructures;
 
@@ -10,7 +9,6 @@ namespace ExoDub.Utility
     {
         private static readonly Regex ResultTextSplitRegex =
             new Regex(@"(?!\[[^\]]*Nick[^\]]*\])(?!\[[^\]]*Name[^\]]*\])\[[^\]]*\]", RegexOptions.IgnoreCase);
-        
         
         public static ChoiceLine[] GetAllChoiceResultLines(this Choice choice)
         {
@@ -25,7 +23,6 @@ namespace ExoDub.Utility
                 })
                 .ToArray();
         }
-
 
         public static ChoiceLine[] GetOrderedChoiceLinesForDisplayedText(this Choice choice, string displayedText)
         {

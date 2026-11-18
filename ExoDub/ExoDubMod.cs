@@ -1,4 +1,3 @@
-
 using System.Linq;
 using System.Reflection;
 using BepInEx;
@@ -6,7 +5,6 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using UnityEngine;
-
 
 namespace ExoDub
 {
@@ -22,8 +20,6 @@ namespace ExoDub
         public ConfigEntry<string> selectedVoicePack;
         public ConfigEntry<float> delayBetweenLines;
         public ConfigEntry<bool> generateCsvExport;
-        
-        
         
         private void Awake()
         {
